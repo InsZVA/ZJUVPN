@@ -2,24 +2,30 @@ package network
 
 import (
 	"log"
+	"net"
 
 	"sync"
 
+	"encoding/hex"
+
+	"github.com/GameXG/tun-go"
 	"github.com/inszva/gol2tp/protocol"
-	"github.com/songgao/water"
 )
 
-var ifce *water.Interface
+var ifce tun.Tun
 
 var exit = make(chan bool, 1)
+var rbuff = make(chan []byte, 1024)
+var wbuff = make(chan []byte, 1024)
 
 func NewCard(ppp *protocol.PPPSession) {
-	ifce, err := water.NewTUN("")
+	var err error
+	ifce, err = tun.OpenTunTap(net.IP(ppp.IP), net.IP([]byte{0, 0, 0, 0}), net.IP([]byte{0, 0, 0, 0}))
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
-	log.Printf("虚拟网卡名称: %s\n", ifce.Name())
+	log.Println("虚拟网卡准备就绪：" + hex.EncodeToString(ppp.IP))
 
 	wp := sync.WaitGroup{}
 	wp.Add(1)
@@ -28,7 +34,6 @@ func NewCard(ppp *protocol.PPPSession) {
 		wp.Done()
 	}()
 
-	packet := make([]byte, 2000)
 LOOP:
 	for {
 		select {
@@ -36,11 +41,13 @@ LOOP:
 			break LOOP
 		default:
 		}
-		n, err := ifce.Read(packet) // IP Packet
+		err := ifce.Read(rbuff) // IP Packet
 		if err != nil {
 			log.Fatal(err)
 		}
-		ppp.SendIP(packet[4:n])
+		packet := <-rbuff
+		log.Println("Read IP Packet:", packet)
+		ppp.SendIP(packet)
 	}
 
 	ppp.StopListen()
@@ -48,7 +55,9 @@ LOOP:
 }
 
 func HandlerVPN(ipdata []byte) {
-	ifce.Write(ipdata)
+	wbuff <- ipdata
+	ifce.Write(wbuff)
+	log.Println("Write IP Packet:", ipdata)
 }
 
 func Exit() {

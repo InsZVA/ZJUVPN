@@ -147,11 +147,11 @@ func (ppp *PPPSession) ReadIPCP(ipcpData []byte) {
 		for i := 0; i < (length-4)/6; i++ {
 			switch ipcpData[4+i*6] {
 			case IPCP_OPT_IP:
-				ppp.IP = ipcpData[4+i*6+2 : 4+i*6+6]
+				ppp.IP = append([]byte{}, ipcpData[4+i*6+2:4+i*6+6]...)
 			case IPCP_OPT_PDNS:
-				ppp.PDNS = ipcpData[4+i*6+2 : 4+i*6+6]
+				ppp.PDNS = append([]byte{}, ipcpData[4+i*6+2:4+i*6+6]...)
 			case IPCP_OPT_SDNS:
-				ppp.SDNS = ipcpData[4+i*6+2 : 4+i*6+6]
+				ppp.SDNS = append([]byte{}, ipcpData[4+i*6+2:4+i*6+6]...)
 			}
 		}
 		ppp.L2tpSession.SendData(IPCPConfigureRequest1(ppp.Identical, ppp.IP, ppp.PDNS, ppp.SDNS))

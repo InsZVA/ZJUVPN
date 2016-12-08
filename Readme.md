@@ -24,7 +24,23 @@
 目前实现了l2tp协议的建立以及ppp协议的认证和断开。由于为ZJUVPN而设计，可能不支持其他L2TP的VPN，另外
 只处理了正常情况，对于异常没有进行处理。
 
+[x] l2tp会话建立
+
+[x] ppp认证
+
+[x] ppp传输
+
+[ ] 虚拟网卡安装
+
+[ ] 配置路由表
+
+[x] Windows支持
+
+[x] 协议断开
+
 ## 感谢
+
+[tun-go项目](https://github.com/FlexibleBroadband/tun-go)
 
 [pppd项目](https://github.com/wkz/pppd)
 
