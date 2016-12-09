@@ -32,6 +32,14 @@ type PPPSession struct {
 
 func (pppSession *PPPSession) ReadPPP(l2tpdata []byte) (ipData []byte) {
 	if l2tpdata[0]&TYPE_CONTROL != 0 {
+		if l2tpdata[0]&LENGTH_EXIST != 0 && l2tpdata[0]&SEQUENCE_EXIST != 0 && l2tpdata[19] == 6 {
+			// Hello
+			pppSession.L2tpSession.Nr++
+			pppSession.L2tpSession.Conn.Write(L2TPControlHEAD(pppSession.L2tpSession.RTunnelId,
+				pppSession.L2tpSession.RSessionId, pppSession.L2tpSession.Ns, pppSession.L2tpSession.Nr))
+			log.Println("Hello")
+			return
+		}
 		log.Println("L2TP链路已经成功建立")
 		pppSession.L2tpSession.SendData(ConfigurationRequest0(pppSession.Identical, pppSession.LMagicNumber))
 		pppSession.Identical++
@@ -187,12 +195,14 @@ func (ppp *PPPSession) Terminate() {
 	log.Println("链接已经断开！")
 }
 
-func (ppp *PPPSession) SendIP(data []byte) {
-	ppp.L2tpSession.SendData(PPP(PPP_IP_DATA, data))
+func (ppp *PPPSession) SendIP(data []byte) (int, error) {
+	//log.Println("Send:", data)
+	return ppp.L2tpSession.SendData(PPP(PPP_IP_DATA, data))
 }
 
 func (ppp *PPPSession) ListenAndServe(handler func(data []byte)) {
 	ppp.Exit = make(chan bool, 1)
+	log.Println("ppp开始侦听")
 LOOP:
 	for {
 		select {

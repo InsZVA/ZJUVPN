@@ -2,7 +2,7 @@
 
 ## 说明
 
-用Go写的VPN认证客户端ForUNIX系统（Linux&Mac OS），目标是做一个没有依赖（不依赖于xl2tpd和pppd）的
+用Go写的VPN认证客户端跨平台（Win&Linux&Mac OS），目标是做一个没有依赖（不依赖于xl2tpd和pppd）的
 浙大校园网认证客户端。目前是为有线&玉泉设计的。
 
 ## 特性
@@ -30,7 +30,7 @@
 
 [x] ppp传输
 
-[ ] 虚拟网卡安装
+[x] 虚拟网卡安装
 
 [ ] 配置路由表
 
@@ -38,9 +38,22 @@
 
 [x] 协议断开
 
+[x] Windows测试
+
+[ ] Linux测试
+
+[ ] MacOS测试
+
+## 测试问题
+
+Windows：
+必须先安装tap0901（可以通过openvpn安装），安装之后，测试UDP没有问题，但是TCP报文回来的都有错误。
+
 ## 感谢
 
 [tun-go项目](https://github.com/FlexibleBroadband/tun-go)
+
+[TAP-windows6项目](https://github.com/OpenVPN/tap-windows6)
 
 [pppd项目](https://github.com/wkz/pppd)
 

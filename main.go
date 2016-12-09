@@ -24,6 +24,7 @@ func main() {
 		LReceiveWindow: 8,
 		LSessionId:     uint16(rand.Uint32() >> 16),
 	}
+
 	session.CreateConn()
 	session.CreateTunnel()
 	session.CreateSession()

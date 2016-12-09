@@ -102,7 +102,7 @@ func (l2tpSession *L2TPSession) CreateSession() {
 	conn.Write(wbuff)
 }
 
-func (l2tpSession *L2TPSession) SendData(data []byte) {
+func (l2tpSession *L2TPSession) SendData(data []byte) (int, error) {
 	dataPacket := make([]byte, 8)
 	length := 8 + len(data)
 	dataPacket[0] = LENGTH_EXIST
@@ -115,7 +115,7 @@ func (l2tpSession *L2TPSession) SendData(data []byte) {
 	dataPacket[7] = byte(l2tpSession.RSessionId)
 	dataPacket = append(dataPacket, data...)
 
-	l2tpSession.Conn.Write(dataPacket)
+	return l2tpSession.Conn.Write(dataPacket)
 }
 
 func (l2tpSession *L2TPSession) CDN() {
